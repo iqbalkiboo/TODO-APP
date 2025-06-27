@@ -4,6 +4,7 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import CheckBoxOutlineBlankIcon from "@mui/icons-material/CheckBoxOutlineBlank";
 import CheckBoxIcon from "@mui/icons-material/CheckBox";
 import ModalTodo, { NewTodo } from "./ModalTodo";
+import ModalConfirmDelete from "./ModalConfirmDelete";
 
 type Props = {
   todo: {
@@ -27,6 +28,7 @@ const TodoCard: React.FC<Props> = ({
   editable = false,
 }) => {
   const [openEdit, setOpenEdit] = useState(false);
+  const [openConfirmDelete, setOpenConfirmDelete] = useState(false);
 
   const handleSaveEdit = (updated: NewTodo) => {
     if (onUpdate) {
@@ -85,7 +87,7 @@ const TodoCard: React.FC<Props> = ({
             {todo.datetime}
           </Typography>
           {onDelete && (
-            <IconButton onClick={() => onDelete(todo.id)}>
+            <IconButton onClick={() => setOpenConfirmDelete(true)}>
               <DeleteIcon fontSize="small" />
             </IconButton>
           )}
@@ -102,6 +104,18 @@ const TodoCard: React.FC<Props> = ({
             text: todo.text,
             datetime: todo.datetime,
           }}
+        />
+      )}
+      {/* Modal Delete */}
+      {editable && onDelete && (
+        <ModalConfirmDelete
+          open={openConfirmDelete}
+          onClose={() => setOpenConfirmDelete(false)}
+          onConfirm={() => {
+            onDelete(todo.id);
+            setOpenConfirmDelete(false);
+          }}
+          todoName={todo.text}
         />
       )}
     </>
