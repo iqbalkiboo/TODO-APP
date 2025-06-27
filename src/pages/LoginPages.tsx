@@ -13,44 +13,42 @@ import GoogleIcon from "@mui/icons-material/Google";
 import AssetsLogin from "../assets/img/VDN-Login Page.png";
 import AssetsDecoration from "../assets/img/Group186.png";
 import { mockLogin, mockGoogleLogin } from "../api/MockApi";
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
+  const { login } = useAuth();
+  const navigate = useNavigate();
 
   const isValidEmail = (email: string) =>
     /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 
   const handleLogin = async () => {
     setError("");
-
     if (!isValidEmail(email)) {
-      setError("Format email tidak valid.");
+      setError("Invalid email format");
       return;
     }
 
     try {
       await mockLogin(email, password);
-      alert("Login berhasil.");
+      login({ email });
+      navigate("/todo", { replace: true });
     } catch (err: any) {
       setError(err);
     }
   };
 
   const handleGoogleLogin = async () => {
-    setError("");
-
-    if (!isValidEmail(email)) {
-      setError("Format email tidak valid.");
-      return;
-    }
-
     try {
       await mockGoogleLogin(email);
-      alert("Login Google berhasil.");
-    } catch (err: any) {
+      login({ email });
+      navigate("/todo", { replace: true });
+    } catch {
       setError("Login Google gagal.");
     }
   };
@@ -59,7 +57,6 @@ export default function LoginPage() {
     <Box
       sx={{ display: "flex", minHeight: "100vh", backgroundColor: "#f5f6fc" }}
     >
-      {/* LEFT: ILLUSTRATION */}
       <Box
         sx={{
           flex: 1,
@@ -78,7 +75,6 @@ export default function LoginPage() {
         />
       </Box>
 
-      {/* RIGHT: FORM */}
       <Box
         sx={{
           flex: 1,
@@ -130,7 +126,7 @@ export default function LoginPage() {
               onChange={(e) => setEmail(e.target.value)}
               fullWidth
               sx={{
-                border: "1px solid #d3dbe4",
+                border: `1px solid ${error && email ? "#ff4444" : "#d3dbe4"}`,
                 borderRadius: "8px",
                 px: "16px",
                 py: "12px",
@@ -142,6 +138,11 @@ export default function LoginPage() {
               }}
             />
           </Box>
+          {error && email && (
+            <Typography fontSize={12} color="#ff4444" mt={1} textAlign="left">
+              Invalid email format
+            </Typography>
+          )}
 
           <Box sx={{ mb: 6 }}>
             <Typography fontWeight={500} fontSize={16} mb={1} textAlign="left">
@@ -152,7 +153,9 @@ export default function LoginPage() {
                 position: "relative",
                 display: "flex",
                 alignItems: "center",
-                border: `1px solid ${!password ? "#ff4444" : "#d3dbe4"}`,
+                border: `1px solid ${
+                  error && password ? "#ff4444" : "#d3dbe4"
+                }`,
                 borderRadius: "8px",
                 backgroundColor: "#fff",
               }}
@@ -178,7 +181,7 @@ export default function LoginPage() {
                 {showPassword ? <VisibilityOff /> : <Visibility />}
               </IconButton>
             </Box>
-            {!password && (
+            {error && password && (
               <Typography fontSize={12} color="#ff4444" mt={1} textAlign="left">
                 Password is incorrect
               </Typography>

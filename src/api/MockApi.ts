@@ -11,8 +11,6 @@ type Todo = {
   completed: boolean;
 };
 
-// ---------- USER AUTH ----------
-
 export function mockLogin(email: string, password?: string): Promise<User> {
   return new Promise((resolve, reject) => {
     setTimeout(() => {
@@ -54,8 +52,6 @@ export function mockGoogleLogin(email: string): Promise<User> {
     }, 500);
   });
 }
-
-// ---------- TODO LIST ----------
 
 export function getTodos(email: string): Promise<Todo[]> {
   return new Promise((resolve) => {
