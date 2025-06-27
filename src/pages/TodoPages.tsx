@@ -16,6 +16,8 @@ type Todo = {
 const TodoPage: React.FC = () => {
   const [todos, setTodos] = useState<Todo[]>([]);
   const [modalTodo, setModalTodo] = useState(false);
+  const [selectedTodo, setSelectedTodo] = useState<NewTodo | undefined>();
+  const [editId, setEditId] = useState<number | null>(null);
 
   useEffect(() => {
     const stored = localStorage.getItem("todos");
@@ -26,16 +28,20 @@ const TodoPage: React.FC = () => {
     localStorage.setItem("todos", JSON.stringify(todos));
   }, [todos]);
 
-  const handleSaveTodo = (newTodo: NewTodo) => {
+  const handleSaveTodo = (data: NewTodo) => {
     setTodos((prev) => [
       ...prev,
-      {
-        id: Date.now(),
-        text: newTodo.text,
-        datetime: newTodo.datetime,
-        completed: false,
-      },
+      { id: Date.now(), ...data, completed: false },
     ]);
+    setModalTodo(false);
+  };
+
+  const handleUpdate = (id: number, updated: NewTodo) => {
+    setTodos((prev) =>
+      prev.map((todo) => (todo.id === id ? { ...todo, ...updated } : todo))
+    );
+    setEditId(null);
+    setSelectedTodo(undefined);
   };
 
   const toggleComplete = (id: number) => {
@@ -48,6 +54,12 @@ const TodoPage: React.FC = () => {
 
   const handleDelete = (id: number) => {
     setTodos((prev) => prev.filter((todo) => todo.id !== id));
+  };
+
+  const closeModal = () => {
+    setModalTodo(false);
+    setEditId(null);
+    setSelectedTodo(undefined);
   };
 
   return (
@@ -103,13 +115,21 @@ const TodoPage: React.FC = () => {
           }))}
           onToggle={toggleComplete}
           onDelete={handleDelete}
+          onUpdate={handleUpdate}
         />
       )}
 
       <ModalTodo
         open={modalTodo}
-        onClose={() => setModalTodo(false)}
-        onSave={handleSaveTodo}
+        onClose={closeModal}
+        onSave={(data) => {
+          if (selectedTodo && editId !== null) {
+            handleUpdate(editId, data);
+          } else {
+            handleSaveTodo(data);
+          }
+        }}
+        initialData={selectedTodo}
       />
     </Box>
   );

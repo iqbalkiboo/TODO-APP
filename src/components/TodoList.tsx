@@ -1,6 +1,7 @@
 import React from "react";
 import { Box, Typography } from "@mui/material";
 import TodoCard from "./TodoCard";
+import { NewTodo } from "./ModalTodo";
 
 type TodoItem = {
   id: number;
@@ -14,9 +15,15 @@ interface TodoListProps {
   todos: TodoItem[];
   onToggle: (id: number) => void;
   onDelete: (id: number) => void;
+  onUpdate: (id: number, updated: NewTodo) => void;
 }
 
-const TodoList: React.FC<TodoListProps> = ({ todos, onToggle, onDelete }) => {
+const TodoList: React.FC<TodoListProps> = ({
+  todos,
+  onToggle,
+  onDelete,
+  onUpdate,
+}) => {
   const checkedTodos = todos.filter((todo) => todo.checked);
   const notCheckedTodos = todos.filter((todo) => !todo.checked);
 
@@ -31,9 +38,11 @@ const TodoList: React.FC<TodoListProps> = ({ todos, onToggle, onDelete }) => {
           <TodoCard
             key={todo.id}
             todo={todo}
-            checked
+            checked={false}
             onToggle={onToggle}
             onDelete={onDelete}
+            onUpdate={onUpdate}
+            editable
           />
         ))}
       </Box>
@@ -47,7 +56,7 @@ const TodoList: React.FC<TodoListProps> = ({ todos, onToggle, onDelete }) => {
           <TodoCard
             key={todo.id}
             todo={todo}
-            checked
+            checked={true}
             onToggle={onToggle}
             onDelete={onDelete}
           />

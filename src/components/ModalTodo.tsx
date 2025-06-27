@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Dialog,
   DialogTitle,
@@ -16,15 +16,31 @@ import dayjs, { Dayjs } from "dayjs";
 
 export type NewTodo = { text: string; datetime: string };
 
-interface AddTodoDialogProps {
+export type ModalTodoProps = {
   open: boolean;
   onClose: () => void;
   onSave: (todo: NewTodo) => void;
-}
+  initialData?: NewTodo; // Optional, if editing
+};
 
-const ModalTodo: React.FC<AddTodoDialogProps> = ({ open, onClose, onSave }) => {
+const ModalTodo: React.FC<ModalTodoProps> = ({
+  open,
+  onClose,
+  onSave,
+  initialData,
+}) => {
   const [text, setText] = useState("");
   const [value, setValue] = useState<Dayjs | null>(null);
+
+  useEffect(() => {
+    if (initialData) {
+      setText(initialData.text);
+      setValue(dayjs(initialData.datetime, "DD/MM/YYYY HH:mm"));
+    } else {
+      setText("");
+      setValue(null);
+    }
+  }, [initialData, open]);
 
   const handleSave = () => {
     if (!text.trim() || !value) return;
@@ -32,28 +48,16 @@ const ModalTodo: React.FC<AddTodoDialogProps> = ({ open, onClose, onSave }) => {
       text: text.trim(),
       datetime: value.format("DD/MM/YYYY HH:mm"),
     });
-    setText("");
-    setValue(null);
-    onClose();
-  };
-
-  const handleClose = () => {
-    setText("");
-    setValue(null);
     onClose();
   };
 
   return (
     <Dialog
       open={open}
-      onClose={handleClose}
+      onClose={onClose}
       fullWidth
       maxWidth="sm"
-      PaperProps={{
-        style: {
-          borderRadius: 10,
-        },
-      }}
+      PaperProps={{ style: { borderRadius: 10 } }}
     >
       <DialogTitle
         sx={{
@@ -65,9 +69,9 @@ const ModalTodo: React.FC<AddTodoDialogProps> = ({ open, onClose, onSave }) => {
           backgroundColor: "#F6F6F6",
         }}
       >
-        Add Todo
+        {initialData ? "Edit Todo" : "Add Todo"}
         <IconButton
-          onClick={handleClose}
+          onClick={onClose}
           sx={{ position: "absolute", right: 8, top: 8 }}
         >
           <CloseIcon />
@@ -85,12 +89,7 @@ const ModalTodo: React.FC<AddTodoDialogProps> = ({ open, onClose, onSave }) => {
               placeholder="Project 1"
               value={text}
               onChange={(e) => setText(e.target.value)}
-              sx={{
-                "& .MuiInputBase-root": {
-                  height: 56,
-                  borderRadius: 1,
-                },
-              }}
+              sx={{ "& .MuiInputBase-root": { height: 56, borderRadius: 1 } }}
             />
           </div>
 
@@ -128,15 +127,13 @@ const ModalTodo: React.FC<AddTodoDialogProps> = ({ open, onClose, onSave }) => {
             textTransform: "none",
             fontWeight: 500,
             px: 4,
-            "&:hover": {
-              backgroundColor: "#083f85",
-            },
+            "&:hover": { backgroundColor: "#083f85" },
           }}
         >
           Save
         </Button>
         <Button
-          onClick={handleClose}
+          onClick={onClose}
           variant="outlined"
           sx={{
             borderColor: "#e9edf5",
