@@ -25,7 +25,7 @@ type MainLayoutProps = {
 
 const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
-  const { user } = useAuth();
+  const { user, logout } = useAuth();
 
   const handleMenuOpen = useCallback((event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
@@ -34,6 +34,10 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
   const handleClose = useCallback(() => {
     setAnchorEl(null);
   }, []);
+
+  const handleLogout = () => {
+    logout();
+  };
 
   return (
     <Box sx={{ display: "flex", minHeight: "100vh" }}>
@@ -125,7 +129,7 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
               open={Boolean(anchorEl)}
               onClose={handleClose}
             >
-              <MenuItem onClick={handleClose}>
+              <MenuItem onClick={handleLogout}>
                 <LogoutIcon fontSize="small" sx={{ mr: 1 }} />
                 Log Out
               </MenuItem>
