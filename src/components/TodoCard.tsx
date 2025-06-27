@@ -28,16 +28,28 @@ const TodoCard: React.FC<Props> = ({ todo, checked, onToggle, onDelete }) => {
     >
       <Box display="flex" alignItems="center" gap={2}>
         <Checkbox
-          checked={checked}
+          checked={checked || false}
           onChange={() => onToggle(todo.id)}
           icon={<CheckBoxOutlineBlankIcon />}
           checkedIcon={<CheckBoxIcon />}
+          sx={{
+            color: 'green',
+            '&.Mui-checked': {
+              color: 'green',
+            },
+          }}
         />
         <Typography fontWeight={500}>{todo.text}</Typography>
       </Box>
       <Box display="flex" alignItems="center" gap={1}>
-        <Typography fontSize={12} color="gray">
-          {todo.datetime}
+        <Typography 
+          fontSize={12} 
+          color={new Date(todo.datetime) < new Date() ? 'error' : 'gray'}
+          sx={{
+            color: new Date(todo.datetime) < new Date() ? '#d32f2f' : 'gray'
+          }}
+        >
+          {new Date(todo.datetime) < new Date() ? 'Overdue Time - ' : ''}{todo.datetime}
         </Typography>
         {onDelete && (
           <IconButton onClick={() => onDelete(todo.id)}>
